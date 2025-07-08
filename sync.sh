@@ -1,99 +1,70 @@
 #!/bin/bash
 
+# Exit immediately if a command exits with a non-zero status.
+set -euo pipefail
+
 # --- Configuration ---
-# Set your GitHub organization name here
 ORGANIZATION="ForYouPage-Org"
+COMMIT_MESSAGE="ci: Update and standardize label sync workflow"
 
-# The full content of the YAML file to be created.
-# Using a 'heredoc' like this is great for multi-line strings.
-WORKFLOW_FILE_CONTENT=$(cat <<'EOF'
-name: Sync Labels from Central Config
-on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-  # Runs on a schedule (daily at 2 AM UTC)
-  schedule:
-    - cron: '0 2 * * *'
-  # Also runs when changes are pushed to the default branch,
-  # specifically if the central config file path is mentioned.
-  push:
-    branches: [ main, master ]
+# --- Corrected Path Handling (THE FIX) ---
+# Get the absolute path to the directory where this script is located.
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+# Define the absolute path to the master workflow file.
+WORKFLOW_SOURCE_FILE="$SCRIPT_DIR/sync-labels-workflow.yml"
+# Destination path within each repository.
+WORKFLOW_DEST_PATH=".github/workflows/sync-labels.yml"
 
-jobs:
-  sync-labels:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Sync Labels
-        uses: micnncim/action-label-syncer@v1
-        env:
-          GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
-          # URL to your centralized labels file in the .github repository
-          FILE: https://raw.githubusercontent.com/ForYouPage-Org/.github/main/labels.yml
 
-        with:
-          # Deletes labels in this repo that are NOT in the central file.
-          # Set to 'false' to prevent deletion and only allow additions/updates.
-          prune: true
-EOF
-)
+# --- Pre-run Checks ---
+if ! command -v gh &> /dev/null; then
+    echo "ERROR: GitHub CLI ('gh') not found. Please install it."
+    exit 1
+fi
 
-# --- Script Execution ---
+if [ ! -f "$WORKFLOW_SOURCE_FILE" ]; then
+    echo "ERROR: Master workflow file not found at '$WORKFLOW_SOURCE_FILE'"
+    echo "Please ensure 'sync-labels-workflow.yml' is in the same directory as this script."
+    exit 1
+fi
+
+# --- Main Execution ---
 echo "Fetching repositories for organization: $ORGANIZATION..."
+REPOS=$(gh repo list "$ORGANIZATION" --limit 500 --json name --jq '.[] | select(.name != ".github") | .name')
 
-# Get a list of all repository names in the organization
-# The --jq query filters the JSON output to give us just the names
-REPOS=$(gh repo list "$ORGANIZATION" --limit 500 --json name --jq '.[].name')
-
-# Loop through each repository name
 for REPO in $REPOS; do
   echo "--------------------------------------------------"
-  echo "Processing repository: $ORGANIZATION/$REPO"
+  echo "Processing: $ORGANIZATION/$REPO"
 
-  # Skip the central .github repository itself
-  if [ "$REPO" == ".github" ]; then
-    echo "Skipping the .github repository."
-    continue
-  fi
+  TEMP_DIR=$(mktemp -d)
+  trap 'rm -rf "$TEMP_DIR"' EXIT
 
-  # Create a temporary directory for cloning to avoid name conflicts
-  TEMP_DIR="temp_repo_clone"
-  rm -rf $TEMP_DIR
+  echo "Cloning into temporary directory..."
+  gh repo clone "$ORGANIZATION/$REPO" "$TEMP_DIR" -- --depth=1
+  cd "$TEMP_DIR"
+
+  mkdir -p "$(dirname "$WORKFLOW_DEST_PATH")"
   
-  echo "Cloning..."
-  if ! gh repo clone "$ORGANIZATION/$REPO" $TEMP_DIR; then
-    echo "ERROR: Failed to clone $REPO. Skipping."
-    continue
-  fi
+  # Use the absolute path to copy the file.
+  cp "$WORKFLOW_SOURCE_FILE" "$WORKFLOW_DEST_PATH"
+  echo "Workflow file placed at '$WORKFLOW_DEST_PATH'."
 
-  cd $TEMP_DIR
-
-  # Create the necessary directory structure
-  mkdir -p .github/workflows
-
-  # Write the workflow content to the file
-  echo "$WORKFLOW_FILE_CONTENT" > .github/workflows/sync-labels.yml
-  echo "Workflow file created."
-
-  # Add, commit, and push the new workflow file
-  git add .github/workflows/sync-labels.yml
-  
-  # Check if there are any changes to commit
-  if git diff --staged --quiet; then
-    echo "Workflow file already exists and is up-to-date. No changes to commit."
+  if [ -z "$(git status --porcelain)" ]; then
+    echo "No changes to workflow file. Repository is up-to-date."
   else
-    echo "Committing and pushing workflow file..."
-    git commit -m "ci: Add workflow to sync labels from central config"
-    if ! git push; then
-        echo "ERROR: Failed to push to $REPO."
+    echo "Changes detected. Committing and pushing..."
+    git add "$WORKFLOW_DEST_PATH"
+    git commit -m "$COMMIT_MESSAGE"
+    git push
+
+    if [ $? -eq 0 ]; then
+        echo "Successfully pushed changes to $REPO."
     else
-        echo "Successfully pushed workflow to $REPO."
+        echo "ERROR: Failed to push changes to $REPO."
     fi
   fi
-
-  # Clean up by removing the temporary directory
   cd ..
-  rm -rf $TEMP_DIR
 done
 
 echo "--------------------------------------------------"
-echo "Script finished. All repositories have been processed."
+echo "✅ Deployment script finished."
