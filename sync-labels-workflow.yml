@@ -25,4 +25,4 @@ jobs:
           manifest: .github-central/labels.yml
           prune: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CENTRAL_REPO_PAT }}
