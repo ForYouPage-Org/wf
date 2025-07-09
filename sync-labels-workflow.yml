@@ -1,28 +1,38 @@
-name: Sync Labels from Central Config
+name: 🏷️ Sync Labels
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 2 * * *"
+    - cron: '0 2 * * *'
   push:
     branches: [main, master]
 
 jobs:
   sync-labels:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      
     steps:
-      # This is Step 1. The '-' is critical.
-      - name: Checkout central config repo
+      - name: 🔄 Checkout Central Config
         uses: actions/checkout@v4
         with:
           repository: ForYouPage-Org/.github
-          path: .github-central
-
-      # This is Step 2. The '-' makes it a separate step.
-      - name: Sync Labels
+          
+      - name: 🏷️ Sync Labels
         uses: micnncim/action-label-syncer@v1
         with:
-          manifest: .github-central/labels.yml
+          manifest: labels.yml
           prune: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.CENTRAL_REPO_PAT }}
+          
+      - name: 📊 Report Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Labels synced successfully!"
+            echo "🏷️ All labels are now in sync with central configuration"
+          else
+            echo "❌ Label sync failed!"
+            echo "Please check the logs for more information"
+          fi
