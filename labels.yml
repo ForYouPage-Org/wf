@@ -1,73 +1,59 @@
-[
-  {
-    "color": "d73a4a",
-    "description": "Something isn't working",
-    "name": "bug",
-  },
-  {
-    "color": "0075ca",
-    "description": "Improvements or additions to documentation",
-    "name": "documentation",
-  },
-  {
-    "color": "a2eeef",
-    "description": "New feature or request",
-    "name": "enhancement",
-  },
-  {
-    "color": "7057ff",
-    "description": "Good for newcomers",
-    "name": "good first issue",
-  },
-  {
-    "color": "008672",
-    "description": "Extra attention is needed",
-    "name": "help wanted",
-  },
-  {
-    "color": "e4e669",
-    "description": "This doesn't seem right",
-    "name": "invalid",
-  },
-  {
-    "color": "d876e3",
-    "description": "Further information is requested",
-    "name": "question",
-  },
-  {
-    "color": "ffffff",
-    "description": "This will not be worked on",
-    "name": "wontfix",
-  },
-  {
-    "color": "960167",
-    "description": "(Active sprint work)",
-    "name": "\U0001F3AF sprint-current",
-  },
-  {
-    "color": "611e65",
-    "description": "(Future work)",
-    "name": "\U0001F4CB backlog",
-  },
-  {
-    "color": "adb281",
-    "description": "(Refined, anyone can take)",
-    "name": "\U0001F680 ready-to-grab",
-  },
-  {
-    "color": "6597a3",
-    "description": "(Someone's working on it)",
-    "name": "⏳ in-progress",
-  },
-  {
-    "color": "379f81",
-    "description": "(Completed, awaiting review)",
-    "name": "✅ done",
-  },
-  {
-    "color": "5a8d63",
-    "description": "(Needs help)",
-    "name": "\U0001F6A8 blocked",
-  },
-  { "color": "67ff32", "description": "", "name": "literature review" },
-]
+- name: "bug"
+  description: "Something isn't working"
+  color: "d73a4a"
+
+- name: "documentation"
+  description: "Improvements or additions to documentation"
+  color: "0075ca"
+
+- name: "enhancement"
+  description: "New feature or request"
+  color: "a2eeef"
+
+- name: "good first issue"
+  description: "Good for newcomers"
+  color: "7057ff"
+
+- name: "help wanted"
+  description: "Extra attention is needed"
+  color: "008672"
+
+- name: "invalid"
+  description: "This doesn't seem right"
+  color: "e4e669"
+
+- name: "question"
+  description: "Further information is requested"
+  color: "d876e3"
+
+- name: "wontfix"
+  description: "This will not be worked on"
+  color: "ffffff"
+
+- name: "🎯 sprint-current"
+  description: "Active sprint work"
+  color: "960167"
+
+- name: "📋 backlog"
+  description: "Future work"
+  color: "611e65"
+
+- name: "🚀 ready-to-grab"
+  description: "Refined, anyone can take"
+  color: "adb281"
+
+- name: "⏳ in-progress"
+  description: "Someone's working on it"
+  color: "6597a3"
+
+- name: "✅ done"
+  description: "Completed, awaiting review"
+  color: "379f81"
+
+- name: "🚨 blocked"
+  description: "Needs help"
+  color: "5a8d63"
+
+- name: "literature review"
+  description: "Requires literature review or research"
+  color: "67ff32"
