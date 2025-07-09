@@ -31,6 +31,12 @@ One command deploys Mercury-style productivity workflows to any repository:
 ./verify.sh ForYouPage-Org/Earth
 ```
 
+### Important Notes
+
+- **Repository must be public**: The ForYouPage-Org/wf repository must be public for workflows to access labels.yml
+- **Actions must be enabled**: Ensure GitHub Actions are enabled in your target repository
+- **Check workflow logs**: If you see "startup_failure", check the Actions tab in your repository
+
 That's it! No tokens, no secrets, no configuration files.
 
 ## 🎛️ Deployment Options
