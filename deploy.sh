@@ -117,75 +117,76 @@ on:
 jobs:
   sync-labels:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      issues: write
-      
+    
     steps:
-      - name: 🔍 Get Labels Config
+      - name: 🏷️ Create Labels Config
         run: |
-          # Download labels.yml from the wf repository
-          curl -sSL https://raw.githubusercontent.com/ForYouPage-Org/wf/main/labels.yml -o labels.yml
+          cat > labels.yml << 'LABELS'
+          - name: bug
+            description: "Something isn't working"
+            color: d73a4a
           
-          - name: "documentation"
+          - name: documentation
             description: "Improvements or additions to documentation"
-            color: "0075ca"
+            color: 0075ca
           
-          - name: "enhancement"
+          - name: enhancement
             description: "New feature or request"
-            color: "a2eeef"
+            color: a2eeef
           
           - name: "good first issue"
             description: "Good for newcomers"
-            color: "7057ff"
+            color: 7057ff
           
           - name: "help wanted"
             description: "Extra attention is needed"
-            color: "008672"
+            color: 008672
           
-          - name: "invalid"
+          - name: invalid
             description: "This doesn't seem right"
-            color: "e4e669"
+            color: e4e669
           
-          - name: "question"
+          - name: question
             description: "Further information is requested"
-            color: "d876e3"
+            color: d876e3
           
-          - name: "wontfix"
+          - name: wontfix
             description: "This will not be worked on"
-            color: "ffffff"
+            color: ffffff
           
-          - name: "🎯 sprint-current"
+          - name: "sprint-current"
             description: "Active sprint work"
-            color: "960167"
+            color: 960167
           
-          - name: "📋 backlog"
+          - name: backlog
             description: "Future work"
-            color: "611e65"
+            color: 611e65
           
-          - name: "🚀 ready-to-grab"
+          - name: "ready-to-grab"
             description: "Refined, anyone can take"
-            color: "adb281"
+            color: adb281
           
-          - name: "⏳ in-progress"
+          - name: "in-progress"
             description: "Someone's working on it"
-            color: "6597a3"
+            color: 6597a3
           
-          - name: "✅ done"
+          - name: done
             description: "Completed, awaiting review"
-            color: "379f81"
+            color: 379f81
           
-          - name: "🚨 blocked"
+          - name: blocked
             description: "Needs help"
-            color: "5a8d63"
+            color: 5a8d63
           
           - name: "literature review"
             description: "Requires literature review or research"
-            color: "67ff32"
-          LABELS_EOF
+            color: 67ff32
+          LABELS
           
       - name: 🏷️ Sync Labels
         uses: micnncim/action-label-syncer@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           manifest: labels.yml
           prune: true
@@ -283,7 +284,7 @@ done
 if [ "${CALENDAR_NOTE:-false}" = "true" ]; then
     echo ""
     echo -e "${YELLOW}📅 Note: Calendar sync requires Google Cloud secrets${NC}"
-    echo "   See: https://github.com/ForYouPage-Org/.github#calendar-integration"
+    echo "   See: https://github.com/ForYouPage-Org/wf#calendar-integration"
 fi
 
 echo ""
