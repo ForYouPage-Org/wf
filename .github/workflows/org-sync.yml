@@ -56,7 +56,7 @@ jobs:
         run: npm install
       
       - name: 🏷️ Sync Labels
-        if: ${{ github.event.inputs.sync_labels != 'false' }}
+        if: github.event.inputs.sync_labels != 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
@@ -65,7 +65,7 @@ jobs:
           node scripts/sync-labels.js
       
       - name: 📋 Manage Issues
-        if: ${{ github.event.inputs.manage_issues != 'false' }}
+        if: github.event.inputs.manage_issues != 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
@@ -93,7 +93,7 @@ jobs:
     name: 📦 Deploy Repository Workflows
     runs-on: ubuntu-latest
     needs: sync-organization
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_repo != '' }}
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target_repo != ''
     permissions:
       contents: write
     
