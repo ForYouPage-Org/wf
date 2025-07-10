@@ -39,6 +39,8 @@ jobs:
       contents: read
       issues: write
       repository-projects: write
+      metadata: read
+      actions: read
     
     steps:
       - name: 🔄 Checkout Repository
@@ -56,7 +58,7 @@ jobs:
       - name: 🏷️ Sync Labels
         if: ${{ github.event.inputs.sync_labels != 'false' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
         run: |
           echo "🚀 Starting label sync..."
@@ -65,7 +67,7 @@ jobs:
       - name: 📋 Manage Issues
         if: ${{ github.event.inputs.manage_issues != 'false' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
         run: |
           echo "🚀 Starting issue management..."
@@ -101,7 +103,7 @@ jobs:
       
       - name: 🚀 Deploy to Target Repository
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           TARGET_REPO: ${{ github.event.inputs.target_repo }}
         run: |
           echo "🚀 Deploying workflows to $TARGET_REPO..."
