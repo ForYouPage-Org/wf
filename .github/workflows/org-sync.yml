@@ -1,7 +1,6 @@
-name: 🚀 Organization Sync
+name: Organization Sync
 
 on:
-  # Manual trigger
   workflow_dispatch:
     inputs:
       sync_labels:
@@ -20,11 +19,9 @@ on:
         default: ''
         type: string
   
-  # Daily sync at 2 AM UTC
   schedule:
     - cron: '0 2 * * *'
   
-  # When configuration changes
   push:
     branches: [main]
     paths:
@@ -33,7 +30,7 @@ on:
 
 jobs:
   sync-organization:
-    name: 🌐 Sync Organization
+    name: Sync Organization
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,40 +40,40 @@ jobs:
       actions: read
     
     steps:
-      - name: 🔄 Checkout Repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
       
-      - name: 🟢 Setup Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
       
-      - name: 📦 Install Dependencies
+      - name: Install Dependencies
         run: npm install
       
-      - name: 🏷️ Sync Labels
+      - name: Sync Labels
         if: github.event.inputs.sync_labels != 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
         run: |
-          echo "🚀 Starting label sync..."
+          echo "Starting label sync..."
           node scripts/sync-labels.js
       
-      - name: 📋 Manage Issues
+      - name: Manage Issues
         if: github.event.inputs.manage_issues != 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           GITHUB_ORGANIZATION: ${{ github.repository_owner }}
         run: |
-          echo "🚀 Starting issue management..."
+          echo "Starting issue management..."
           node scripts/issue-manager.js
       
-      - name: 📊 Generate Report
+      - name: Generate Report
         if: always()
         run: |
-          echo "## 📊 Sync Report" >> $GITHUB_STEP_SUMMARY
+          echo "## Sync Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Configuration" >> $GITHUB_STEP_SUMMARY
           echo "- Organization: ${{ github.repository_owner }}" >> $GITHUB_STEP_SUMMARY
