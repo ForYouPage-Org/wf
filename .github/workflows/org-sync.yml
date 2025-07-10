@@ -79,7 +79,7 @@ jobs:
           echo "- Organization: ${{ github.repository_owner }}" >> $GITHUB_STEP_SUMMARY
           echo "- Labels synced: ${{ github.event.inputs.sync_labels != 'false' }}" >> $GITHUB_STEP_SUMMARY
           echo "- Issues managed: ${{ github.event.inputs.manage_issues != 'false' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Target repository: ${{ github.event.inputs.target_repo || 'All repositories' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Target repository: All repositories" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Results" >> $GITHUB_STEP_SUMMARY
           echo "Check the logs above for detailed results." >> $GITHUB_STEP_SUMMARY
