@@ -1,0 +1,166 @@
+name: 🚀 Organization Sync
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+    inputs:
+      sync_labels:
+        description: 'Sync labels to all repositories'
+        required: false
+        default: 'true'
+        type: boolean
+      manage_issues:
+        description: 'Check issue limits and manage'
+        required: false
+        default: 'true'
+        type: boolean
+      target_repo:
+        description: 'Target specific repository (optional)'
+        required: false
+        default: ''
+        type: string
+  
+  # Daily sync at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # When configuration changes
+  push:
+    branches: [main]
+    paths:
+      - 'config/**'
+      - 'scripts/**'
+
+jobs:
+  sync-organization:
+    name: 🌐 Sync Organization
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      repository-projects: write
+    
+    steps:
+      - name: 🔄 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: 📦 Install Dependencies
+        run: |
+          cat > package.json << 'EOF'
+          {
+            "name": "foryoupage-org-sync",
+            "version": "1.0.0",
+            "dependencies": {
+              "@octokit/rest": "^20.0.0"
+            }
+          }
+          EOF
+          npm install
+      
+      - name: 🏷️ Sync Labels
+        if: ${{ github.event.inputs.sync_labels != 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ORGANIZATION: ${{ github.repository_owner }}
+        run: |
+          echo "🚀 Starting label sync..."
+          node scripts/sync-labels.js
+      
+      - name: 📋 Manage Issues
+        if: ${{ github.event.inputs.manage_issues != 'false' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ORGANIZATION: ${{ github.repository_owner }}
+        run: |
+          echo "🚀 Starting issue management..."
+          node scripts/issue-manager.js
+      
+      - name: 📊 Generate Report
+        if: always()
+        run: |
+          echo "## 📊 Sync Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- Organization: ${{ github.repository_owner }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Labels synced: ${{ github.event.inputs.sync_labels != 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Issues managed: ${{ github.event.inputs.manage_issues != 'false' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Target repository: ${{ github.event.inputs.target_repo || 'All repositories' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Results" >> $GITHUB_STEP_SUMMARY
+          echo "Check the logs above for detailed results." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "*Automated by ForYouPage-Org productivity system*" >> $GITHUB_STEP_SUMMARY
+
+  deploy-repo-workflows:
+    name: 📦 Deploy Repository Workflows
+    runs-on: ubuntu-latest
+    needs: sync-organization
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_repo != '' }}
+    permissions:
+      contents: write
+    
+    steps:
+      - name: 🔄 Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: 🚀 Deploy to Target Repository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_REPO: ${{ github.event.inputs.target_repo }}
+        run: |
+          echo "🚀 Deploying workflows to $TARGET_REPO..."
+          
+          # Clone target repository
+          gh repo clone $TARGET_REPO temp-repo
+          cd temp-repo
+          
+          # Create .github/workflows directory
+          mkdir -p .github/workflows
+          
+          # Copy minimal sync workflow
+          cat > .github/workflows/repo-sync.yml << 'EOF'
+          name: 🔄 Repository Sync
+          
+          on:
+            schedule:
+              - cron: '0 6 * * *'  # Daily at 6 AM UTC
+            workflow_dispatch:
+          
+          jobs:
+            sync:
+              runs-on: ubuntu-latest
+              steps:
+                - name: 🚀 Trigger Organization Sync
+                  uses: actions/github-script@v7
+                  with:
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    script: |
+                      await github.rest.actions.createWorkflowDispatch({
+                        owner: '${{ github.repository_owner }}',
+                        repo: 'wf',
+                        workflow_id: 'org-sync.yml',
+                        ref: 'main',
+                        inputs: {
+                          target_repo: '${{ github.repository }}',
+                          sync_labels: 'true',
+                          manage_issues: 'true'
+                        }
+                      });
+                      console.log('✅ Triggered organization sync');
+          EOF
+          
+          # Commit and push if there are changes
+          if ! git diff --quiet; then
+            git add .github/workflows/repo-sync.yml
+            git commit -m "🔄 Add repository sync workflow"
+            git push
+            echo "✅ Deployed sync workflow to $TARGET_REPO"
+          else
+            echo "ℹ️ No changes needed in $TARGET_REPO"
+          fi

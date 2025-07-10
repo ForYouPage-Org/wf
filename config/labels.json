@@ -1,0 +1,67 @@
+[
+  {
+    "name": "bug",
+    "description": "Something isn't working",
+    "color": "d73a4a"
+  },
+  {
+    "name": "enhancement",
+    "description": "New feature or request", 
+    "color": "a2eeef"
+  },
+  {
+    "name": "documentation",
+    "description": "Improvements or additions to documentation",
+    "color": "0075ca"
+  },
+  {
+    "name": "good first issue",
+    "description": "Good for newcomers",
+    "color": "7057ff"
+  },
+  {
+    "name": "help wanted",
+    "description": "Extra attention is needed",
+    "color": "008672"
+  },
+  {
+    "name": "question",
+    "description": "Further information is requested",
+    "color": "d876e3"
+  },
+  {
+    "name": "sprint-current",
+    "description": "🎯 Active sprint work",
+    "color": "960167"
+  },
+  {
+    "name": "backlog",
+    "description": "📋 Future work",
+    "color": "611e65"
+  },
+  {
+    "name": "ready-to-grab",
+    "description": "🚀 Ready for anyone to pick up",
+    "color": "adb281"
+  },
+  {
+    "name": "in-progress",
+    "description": "⏳ Someone is working on it",
+    "color": "6597a3"
+  },
+  {
+    "name": "done",
+    "description": "✅ Completed, awaiting review",
+    "color": "379f81"
+  },
+  {
+    "name": "blocked",
+    "description": "🚨 Blocked by dependencies",
+    "color": "b60205"
+  },
+  {
+    "name": "literature review",
+    "description": "📚 Requires research",
+    "color": "67ff32"
+  }
+]

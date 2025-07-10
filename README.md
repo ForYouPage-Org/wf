@@ -1,139 +1,170 @@
-# 🚀 ForYouPage-Org Productivity System
+# 🚀 ForYouPage-Org Centralized Management System
 
-> Simple, intuitive GitHub workflow deployment - no configuration required!
+> **New Design**: Organization-first approach with centralized control
 
-## 🎯 What This Does
+## 🎯 What This System Does
 
-One command deploys Mercury-style productivity workflows to any repository:
-- **🏷️ Smart Labels**: Consistent Mercury-style labels across repos
-- **🚦 WIP Limits**: Prevent overload (max 5 in-progress, 10 sprint items)
-- **📅 Calendar Sync**: Auto-sync issue due dates to Google Calendar
-- **🤖 Zero Setup**: Works immediately with built-in GitHub permissions
+This repository serves as the **central control hub** for your entire GitHub organization:
+
+- **🏷️ Automatic Label Sync**: Sync labels across all repositories from one place
+- **📋 Issue Management**: Monitor and enforce issue limits organization-wide  
+- **📅 Calendar Integration**: Sync issue due dates to Google Calendar
+- **📝 Template Sync**: Deploy consistent issue templates everywhere
+- **🔧 Zero Maintenance**: Set once, runs automatically
 
 ## ⚡ Quick Start
 
-### Deploy to One Repository
+### 1. One-Command Deployment
 
 ```bash
-# Simple command - works with any GitHub repo
-./deploy.sh https://github.com/ForYouPage-Org/Earth
-
-# Or just:
-./deploy.sh
-
-# Then enter the repo URL when prompted
+# Deploy the entire system
+./deploy-org.sh
 ```
 
-### Verify It Worked
+### 2. Choose Your Action
 
+- **Full Sync**: Labels + Issue Management + Templates
+- **Labels Only**: Just sync labels across all repos
+- **Issues Only**: Check limits and manage issues
+- **Specific Repo**: Target one repository
+- **Status Check**: View organization overview
+
+## 🏗️ Architecture
+
+```
+ForYouPage-Org/wf (This Repository)
+├── config/
+│   ├── labels.json        # Master label configuration
+│   └── settings.json      # Organization settings & limits
+├── scripts/
+│   ├── sync-labels.js     # Custom label sync (reliable)
+│   └── issue-manager.js   # Issue limits & calendar sync
+├── templates/
+│   ├── bug_report.yml     # Bug report template
+│   └── feature_request.yml # Feature request template
+├── .github/workflows/
+│   └── org-sync.yml       # Master workflow (runs here)
+└── deploy-org.sh          # One-command deployment
+```
+
+## 🔧 Key Features
+
+### 🎯 Centralized Control
+- **Single Source**: All configuration in this repository
+- **Batch Operations**: Process all repositories at once
+- **Admin Control**: Organization admins control everything
+
+### 🏷️ Smart Label Sync
+- **Custom Script**: No dependency on broken third-party actions
+- **Mercury Labels**: Full support for emoji labels and descriptions
+- **Safe Updates**: Creates, updates, and optionally removes labels
+
+### 📋 Intelligent Issue Management
+- **WIP Limits**: Automatic enforcement of work-in-progress limits
+- **Issue Limits**: Prevent repository overload
+- **Warning System**: Automatic issues when limits exceeded
+- **Calendar Sync**: Due date integration with Google Calendar
+
+### 🚀 Automated Deployment
+- **Daily Sync**: Runs automatically at 2 AM UTC
+- **Manual Trigger**: Run anytime with workflow dispatch
+- **Selective Sync**: Choose what to sync (labels, issues, etc.)
+- **Repository Filtering**: Include/exclude private/public repos
+
+## ⚙️ Configuration
+
+### Labels (`config/labels.json`)
+```json
+[
+  {
+    "name": "sprint-current",
+    "description": "🎯 Active sprint work", 
+    "color": "960167"
+  }
+]
+```
+
+### Settings (`config/settings.json`)
+```json
+{
+  "issue_limits": {
+    "max_open_issues_per_repo": 50,
+    "max_sprint_current": 10,
+    "max_in_progress": 5
+  },
+  "repository_filters": {
+    "exclude_repos": [".github", "wf"],
+    "include_private": true,
+    "include_public": true
+  }
+}
+```
+
+## 📋 Usage Examples
+
+### Sync Everything
 ```bash
-# Check everything deployed correctly
-./verify.sh ForYouPage-Org/Earth
+./deploy-org.sh
+# Select option 1: Full organization sync
 ```
 
-### Important Notes
-
-- **Repository must be public**: The ForYouPage-Org/wf repository must be public for workflows to access labels.yml
-- **Actions must be enabled**: Ensure GitHub Actions are enabled in your target repository
-- **Check workflow logs**: If you see "startup_failure", check the Actions tab in your repository
-
-That's it! No tokens, no secrets, no configuration files.
-
-## 🎛️ Deployment Options
-
-The deploy script gives you three choices:
-
-1. **🏷️ Label Sync Only** - Mercury-style labels that sync daily
-2. **🚦 Labels + WIP Limits** - Adds work-in-progress monitoring  
-3. **📅 Everything** - Complete productivity suite with calendar sync
-
-## 📋 Mercury Label System
-
-Your deployed labels will match the Mercury working style:
-
-| Label | Use Case | 
-|-------|----------|
-| 🎯 sprint-current | Active sprint work |
-| 📋 backlog | Future work |
-| 🚀 ready-to-grab | Refined, anyone can take |
-| ⏳ in-progress | Someone's working on it |
-| ✅ done | Completed, awaiting review |
-| 🚨 blocked | Needs help |
-
-Plus: bug, enhancement, documentation, good first issue, etc.
-
-## 🛠️ Key Features
-
-### Automatic Label Sync
-- Runs daily at 2 AM UTC
-- Syncs from this central repository
-- Keeps all repos consistent
-
-### WIP Limiting
-- Max 5 items "in-progress" 
-- Max 10 items "sprint-current"
-- Automatic warnings when exceeded
-
-### Calendar Integration
-- Detects due dates like `[7/4]` or `[Due: 07/07/2025]`
-- Creates Google Calendar events
-- Sends 1-day and 2-day reminders
-
-## 🔧 Commands
-
+### Deploy to Specific Repository
 ```bash
-# Deploy to any repository
-./deploy.sh https://github.com/YourOrg/YourRepo
-
-# Verify deployment worked
-./verify.sh YourOrg/YourRepo
-
-# Trigger manual sync
-gh workflow run sync-labels.yml --repo YourOrg/YourRepo
-
-# Check workflow status
-gh run list --repo YourOrg/YourRepo
+./deploy-org.sh  
+# Select option 4: Deploy to specific repository
+# Enter: Earth
 ```
 
-## 🎉 Zero Configuration Setup
-
-**No PATs or secrets needed!** The system uses:
-- GitHub's built-in `GITHUB_TOKEN` for workflows
-- Public repository access for label configuration
-- Standard GitHub Actions permissions
-
-### Optional: Calendar Integration
-
-For Google Calendar sync, add these repository secrets:
-- `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-- `GOOGLE_SERVICE_ACCOUNT_KEY`  
-- `GOOGLE_CALENDAR_ID`
-
-## 🏗️ File Structure
-
-```
-.github/
-├── deploy.sh           # 🚀 Main deployment script
-├── verify.sh           # ✅ Verify deployment
-├── labels.yml          # 🏷️ Mercury-style labels
-├── workflows/          # 📁 Workflow templates
-│   ├── wip-limiter.yml
-│   └── calendar-sync.yml
-└── README.md           # 📖 This file
+### Check Organization Status
+```bash
+./deploy-org.sh
+# Select option 5: View organization status
 ```
 
-## 🤝 Contributing
+### Manual Workflow Trigger
+```bash
+# Trigger from any repository
+gh workflow run org-sync.yml --repo ForYouPage-Org/wf
+```
 
-1. Keep it simple and intuitive
-2. Follow Mercury working style
-3. Test with `./verify.sh` before submitting
+## 🔐 Permissions Required
 
-## 📚 Resources
+- **Organization Admin**: To access all repositories
+- **Workflow Permissions**: `contents: read`, `issues: write`, `repository-projects: write`
+- **GitHub Token**: Automatic `GITHUB_TOKEN` works for same-org access
 
-- [Mercury Working Style](https://github.com/MARX1108/Mercury/issues/1)
-- [GitHub CLI Documentation](https://cli.github.com/)
-- [GitHub Actions](https://docs.github.com/actions)
+## 🎯 Benefits of New Design
 
----
+### ✅ What's Fixed
+1. **No Third-Party Dependencies**: Custom scripts that actually work
+2. **Organization-Level Control**: Manage everything from one place
+3. **Reliable Label Sync**: Handles emojis and complex configurations
+4. **Smart Issue Management**: Automatic limits and warnings
+5. **Zero Repository Setup**: No workflow deployment needed per repo
 
-*Built for busy executives who need one simple system that just works.*
+### 🆚 vs. Old Approach
+| Old | New |
+|-----|-----|
+| Deploy to each repo individually | Deploy once, manage everything |
+| Unreliable third-party actions | Custom Node.js scripts |
+| No centralized control | Full organization oversight |
+| Manual issue management | Automated limits and warnings |
+| Complex setup process | One-command deployment |
+
+## 🔄 How It Works
+
+1. **Configuration**: Edit `config/` files in this repository
+2. **Trigger**: Run `./deploy-org.sh` or trigger workflows
+3. **Processing**: Scripts process all repositories in parallel
+4. **Results**: Labels synced, limits enforced, issues managed
+5. **Monitoring**: Automatic warnings and status reports
+
+## 🎉 Ready to Use
+
+The system is **production-ready** and designed for:
+- Busy executives managing multiple projects
+- Organizations with many repositories
+- Teams that need consistent workflows
+- Automatic enforcement of productivity limits
+
+**No external dependencies. No complex setup. Just works.** 🚀
