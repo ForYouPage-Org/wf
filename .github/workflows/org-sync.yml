@@ -8,6 +8,11 @@ on:
         required: false
         default: 'true'
         type: boolean
+      manage_issues:
+        description: 'Check issue limits and manage'
+        required: false
+        default: 'true'
+        type: boolean
 
 jobs:
   sync-organization:
@@ -39,3 +44,12 @@ jobs:
         run: |
           echo "Starting label sync..."
           node scripts/sync-labels.js
+      
+      - name: Manage Issues
+        if: github.event.inputs.manage_issues != 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.ORG_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
+          GITHUB_ORGANIZATION: ${{ github.repository_owner }}
+        run: |
+          echo "Starting issue management..."
+          node scripts/issue-manager.js
