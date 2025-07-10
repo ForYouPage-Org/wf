@@ -1,12 +1,17 @@
 [
   {
+    "name": "test",
+    "description": "wf beta test",
+    "color": "d73a4a"
+  },
+  {
     "name": "bug",
     "description": "Something isn't working",
     "color": "d73a4a"
   },
   {
     "name": "enhancement",
-    "description": "New feature or request", 
+    "description": "New feature or request",
     "color": "a2eeef"
   },
   {

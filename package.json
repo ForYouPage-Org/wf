@@ -1,0 +1,17 @@
+{
+  "name": "foryoupage-org-sync",
+  "version": "1.0.0",
+  "description": "ForYouPage-Org centralized management system",
+  "main": "scripts/sync-labels.js",
+  "scripts": {
+    "sync-labels": "node scripts/sync-labels.js",
+    "manage-issues": "node scripts/issue-manager.js",
+    "test": "node scripts/test-single-repo.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

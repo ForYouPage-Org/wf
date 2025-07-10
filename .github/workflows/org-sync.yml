@@ -51,17 +51,7 @@ jobs:
           cache: 'npm'
       
       - name: 📦 Install Dependencies
-        run: |
-          cat > package.json << 'EOF'
-          {
-            "name": "foryoupage-org-sync",
-            "version": "1.0.0",
-            "dependencies": {
-              "@octokit/rest": "^20.0.0"
-            }
-          }
-          EOF
-          npm install
+        run: npm install
       
       - name: 🏷️ Sync Labels
         if: ${{ github.event.inputs.sync_labels != 'false' }}
